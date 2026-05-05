@@ -1,80 +1,84 @@
 const video = document.getElementById("preview");
-const canvas = document.createElement("canvas");
-const ctx = canvas.getContext("2d");
-
-const startBtn = document.getElementById("startScan");
 const tagSpan = document.getElementById("tagId");
+
+const scanCameraBtn = document.getElementById("scanCamera");
+const scanPhotoBtn = document.getElementById("scanPhoto");
+const scanBLEBtn = document.getElementById("scanBLE");
+
+const photoInput = document.getElementById("photoInput");
 const sendBtn = document.getElementById("send");
-const mapBtn = document.getElementById("openMap");
 
 let scannedTag = null;
-let scanning = false;
 
-startBtn.onclick = async () => {
+// -------------------------------
+// 1. QR SCAN VIA CAMERA
+// -------------------------------
+scanCameraBtn.onclick = async () => {
     const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: "environment", width: { ideal: 1920 }, height: { ideal: 1080 } }
+        video: { facingMode: "environment" }
     });
 
     video.srcObject = stream;
-    video.setAttribute("playsinline", true);
-    await video.play();
+    video.play();
 
-    scanning = true;
-    setTimeout(scanLoop, 300);
-};
+    const codeReader = new ZXing.BrowserQRCodeReader();
 
-function enhance(imageData) {
-    const d = imageData.data;
-
-    // Adaptive thresholding
-    for (let i = 0; i < d.length; i += 4) {
-        const v = (d[i] + d[i + 1] + d[i + 2]) / 3;
-        const bw = v < 140 ? 0 : 255; // agressieve threshold
-        d[i] = d[i + 1] = d[i + 2] = bw;
-    }
-
-    return imageData;
-}
-
-async function scanLoop() {
-    if (!scanning) return;
-
-    const vw = video.videoWidth;
-    const vh = video.videoHeight;
-
-    const crop = Math.floor(Math.min(vw, vh) * 0.55);
-    const x = Math.floor((vw - crop) / 2);
-    const y = Math.floor((vh - crop) / 2);
-
-    canvas.width = crop;
-    canvas.height = crop;
-
-    ctx.drawImage(video, x, y, crop, crop, 0, 0, crop, crop);
-
-    let img = ctx.getImageData(0, 0, crop, crop);
-    img = enhance(img);
-    ctx.putImageData(img, 0, 0);
-
-    try {
-        const codeReader = new ZXing.BrowserQRCodeReader();
-        const result = await codeReader.decodeFromImage(canvas);
-
-        if (result && result.text) {
+    codeReader.decodeFromVideoElement(video, (result, err) => {
+        if (result) {
             scannedTag = result.text.trim();
             tagSpan.textContent = scannedTag;
-            scanning = false;
-            return;
         }
+    });
+};
+
+// -------------------------------
+// 2. QR SCAN VIA FOTO
+// -------------------------------
+scanPhotoBtn.onclick = () => photoInput.click();
+
+photoInput.onchange = async () => {
+    const file = photoInput.files[0];
+    if (!file) return;
+
+    const img = new Image();
+    img.src = URL.createObjectURL(file);
+
+    img.onload = async () => {
+        const codeReader = new ZXing.BrowserQRCodeReader();
+        const result = await codeReader.decodeFromImage(img);
+
+        if (result) {
+            scannedTag = result.text.trim();
+            tagSpan.textContent = scannedTag;
+        } else {
+            alert("Geen QR gevonden in foto.");
+        }
+    };
+};
+
+// -------------------------------
+// 3. SCAN SMARTTAG VIA BLUETOOTH
+// -------------------------------
+scanBLEBtn.onclick = async () => {
+    try {
+        const device = await navigator.bluetooth.requestDevice({
+            acceptAllDevices: true
+        });
+
+        scannedTag = device.id;
+        tagSpan.textContent = scannedTag;
+
     } catch (e) {
-        // geen scan, doorgaan
+        alert("BLE fout: " + e);
     }
+};
 
-    setTimeout(scanLoop, 70); // 14 scans per seconde
-}
-
+// -------------------------------
+// OPSLAAN
+// -------------------------------
 sendBtn.onclick = async () => {
     if (!scannedTag) {
-        alert("Geen SmartTag gescand.");
+        alert("Geen ID gescand.");
         return;
     }
 
@@ -92,11 +96,5 @@ sendBtn.onclick = async () => {
         body: JSON.stringify(payload)
     });
 
-    alert("SmartTag opgeslagen!");
-
-    mapBtn.style.display = "block";
-    mapBtn.onclick = () => {
-        window.location.href = "map.html";
-    };
+    alert("Opgeslagen!");
 };
-
