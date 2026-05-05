@@ -1,5 +1,5 @@
 document.getElementById("scanCamera").onclick = () => {
-    alert("Camera-knop werkt!");
+    alert("Camera-knop die werkt!");
 };
 
 document.getElementById("scanPhoto").onclick = () => {
