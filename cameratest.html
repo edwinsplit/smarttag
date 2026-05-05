@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Camera Test</title>
+<style>
+video {
+    width: 100%;
+    height: 300px;
+    background: #000;
+}
+</style>
+</head>
+<body>
+
+<h2>Camera Test</h2>
+<p>Als je hier geen camera ziet, ligt het NIET aan de QR‑scanner.</p>
+
+<video id="cam" autoplay playsinline></video>
+
+<script>
+navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
+.then(stream => {
+    document.getElementById("cam").srcObject = stream;
+})
+.catch(err => {
+    alert("Camera fout: " + err);
+});
+</script>
+
+</body>
+</html>
