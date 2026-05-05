@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartTag QR Scanner</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<h2>SmartTag QR‑scanner</h2>
+
+<div id="camera-container">
+    <video id="preview" playsinline></video>
+</div>
+
+<button id="startScan">Start QR‑scan</button>
+
+<div id="result">
+    <h3>Gescande SmartTag</h3>
+    <p><strong>Tag‑ID:</strong> <span id="tagId">—</span></p>
+
+    <label>Ringnummer:</label>
+    <input id="ring" type="text" placeholder="1234567‑24">
+
+    <label>Eigenaar:</label>
+    <input id="owner" type="text" placeholder="Edwin">
+
+    <button id="send">Opslaan</button>
+</div>
+
+<script src="https://unpkg.com/html5-qrcode"></script>
+<script src="scanner.js"></script>
+
+</body>
+</html>
