@@ -1,28 +1,33 @@
+const video = document.getElementById("preview");
 const startBtn = document.getElementById("startScan");
 const tagSpan = document.getElementById("tagId");
 const sendBtn = document.getElementById("send");
 const mapBtn = document.getElementById("openMap");
-const video = document.getElementById("preview");
 
 let scannedTag = null;
 
 startBtn.onclick = async () => {
+    // 1. Start camera handmatig (iPhone vereist dit)
+    const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: "environment" }
+    });
+
+    video.srcObject = stream;
+    video.setAttribute("playsinline", true);
+    await video.play();
+
+    // 2. Wacht tot camera echt draait
+    await new Promise(r => setTimeout(r, 400));
+
+    // 3. Start ZXing scanner
     const codeReader = new ZXing.BrowserQRCodeReader();
 
-    try {
-        const result = await codeReader.decodeFromVideoDevice(
-            null,
-            "preview",
-            (res, err) => {
-                if (res) {
-                    scannedTag = res.text.trim();
-                    tagSpan.textContent = scannedTag;
-                }
-            }
-        );
-    } catch (e) {
-        alert("Camera fout: " + e);
-    }
+    codeReader.decodeFromVideoElement(video, (result, err) => {
+        if (result) {
+            scannedTag = result.text.trim();
+            tagSpan.textContent = scannedTag;
+        }
+    });
 };
 
 sendBtn.onclick = async () => {
