@@ -8,11 +8,10 @@
 </head>
 <body>
 
-<h2>SmartTag QR‑scanner</h2>
+<h2>SmartTag QR‑scanner (iPhone versie)</h2>
 
-<div id="camera-container">
-    <video id="preview" playsinline></video>
-</div>
+<video id="preview" autoplay playsinline></video>
+<canvas id="qr-canvas"></canvas>
 
 <button id="startScan">Start QR‑scan</button>
 
@@ -30,7 +29,7 @@
     <button id="openMap" style="display:none;">Bekijk op kaart</button>
 </div>
 
-<script src="https://unpkg.com/html5-qrcode"></script>
+<script src="https://cdn.jsdelivr.net/npm/jsqr/dist/jsQR.js"></script>
 <script src="scanner.js"></script>
 
 </body>
