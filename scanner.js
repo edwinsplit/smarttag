@@ -1,6 +1,7 @@
 const startBtn = document.getElementById("startScan");
 const tagSpan = document.getElementById("tagId");
 const sendBtn = document.getElementById("send");
+const mapBtn = document.getElementById("openMap");
 
 let scannedTag = null;
 
@@ -31,11 +32,31 @@ sendBtn.onclick = async () => {
         timestamp: Date.now()
     };
 
+    // 1. POST naar Railway backend
     await fetch("https://nivo-backend-production.up.railway.app/api/ble", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
     });
 
+    // 2. tags.json update (downloadbare versie)
+    const existing = await fetch("tags.json").then(r => r.json());
+    existing.push(payload);
+
+    const blob = new Blob([JSON.stringify(existing, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "tags.json";
+    a.click();
+
     alert("SmartTag opgeslagen!");
+
+    // 3. Toon kaartknop
+    mapBtn.style.display = "block";
+    mapBtn.onclick = () => {
+        window.location.href = "map.html";
+    };
 };
+
