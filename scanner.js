@@ -1,3 +1,19 @@
+document.getElementById("scanCamera").onclick = () => {
+    alert("Camera-knop werkt!");
+};
+
+document.getElementById("scanPhoto").onclick = () => {
+    alert("Foto-knop werkt!");
+};
+
+document.getElementById("scanBLE").onclick = () => {
+    alert("BLE-knop werkt!");
+};
+
+
+
+
+
 scanCameraBtn.onclick = async () => {
     try {
         console.log("Camera starten...");
