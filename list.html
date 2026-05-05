@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartTag Overzicht</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<h2>SmartTag Overzicht</h2>
+
+<p>Alle gescande SmartTags uit <code>tags.json</code></p>
+
+<table id="tagTable">
+    <thead>
+        <tr>
+            <th>Tag‑ID</th>
+            <th>Ringnummer</th>
+            <th>Eigenaar</th>
+            <th>Tijd</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+<script>
+async function loadTags() {
+    const res = await fetch("tags.json");
+    const data = await res.json();
+
+    const tbody = document.querySelector("#tagTable tbody");
+    tbody.innerHTML = "";
+
+    data.forEach(entry => {
+        const tr = document.createElement("tr");
+
+        tr.innerHTML = `
+            <td>${entry.tag_id}</td>
+            <td>${entry.ring}</td>
+            <td>${entry.owner}</td>
+            <td>${new Date(entry.timestamp).toLocaleString()}</td>
+        `;
+
+        tbody.appendChild(tr);
+    });
+}
+
+loadTags();
+</script>
+
+</body>
+</html>
